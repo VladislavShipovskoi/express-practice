@@ -7,7 +7,7 @@ const index = (req, res) => {
 
   res.render("main", {
     title: "Library",
-    content: "books/viewAll",
+    content: "books/list",
     books: books,
   });
 };
