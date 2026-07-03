@@ -12,4 +12,18 @@ const index = (req, res) => {
   });
 };
 
-module.exports = { index };
+const createForm = (req, res) => {
+  res.render("main", {
+    title: "Create book",
+    content: "books/create",
+  });
+};
+
+const createFormSubmit = (req, res) => {
+  const { books } = booksStore;
+  const newBook = createBase(req);
+  books.push(newBook);
+  res.redirect("/");
+};
+
+module.exports = { index, createForm, createFormSubmit };
