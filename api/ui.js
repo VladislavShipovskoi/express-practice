@@ -26,4 +26,16 @@ const createFormSubmit = (req, res) => {
   res.redirect("/");
 };
 
-module.exports = { index, createForm, createFormSubmit };
+const view = (req, res) => {
+  const { books } = booksStore;
+  const bookId = req.params.id;
+  const book = books.find((book) => book.id === bookId);
+
+  res.render("main", {
+    title: "Book details",
+    content: "books/view",
+    book: book,
+  });
+};
+
+module.exports = { index, view, createForm, createFormSubmit };

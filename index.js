@@ -8,6 +8,7 @@ const app = express();
 app.use(express.json());
 app.set("view engine", "ejs");
 app.use(logger);
+app.use("/public", express.static(__dirname + "/public"));
 app.use("/", uiRouter);
 app.use("/api/user", userRouter);
 app.use("/api/books", booksRouter);
