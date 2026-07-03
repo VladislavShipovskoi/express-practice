@@ -1,6 +1,6 @@
 const { books: booksStore } = require("../store");
 const { Book } = require("../entity");
-const { createBase } = require("./books");
+const { createBase, deleteBase } = require("./books");
 
 const index = (req, res) => {
   const { books } = booksStore;
@@ -38,4 +38,17 @@ const view = (req, res) => {
   });
 };
 
-module.exports = { index, view, createForm, createFormSubmit };
+const deleteById = (req, res) => {
+  deleteBase(
+    req,
+    res,
+    () => {
+      res.redirect("/");
+    },
+    () => {
+      res.status(404).json({ message: "Book not found" });
+    },
+  );
+};
+
+module.exports = { index, view, createForm, createFormSubmit, deleteById };

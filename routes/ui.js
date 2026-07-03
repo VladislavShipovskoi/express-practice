@@ -7,5 +7,6 @@ router.get("/", uiApi.index);
 router.get("/book/create", uiApi.createForm);
 router.post("/book/create", fileUpload.single("img"), uiApi.createFormSubmit);
 router.get("/book/:id", uiApi.view);
+router.get("/book/:id/delete", uiApi.deleteById);
 
 module.exports = router;

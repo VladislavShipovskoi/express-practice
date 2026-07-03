@@ -102,18 +102,31 @@ const update = (req, res) => {
   }
 };
 
-const deleteById = (req, res) => {
+const deleteBase = (req, res, callbackSuccess, callbackError) => {
   const { books } = booksStore;
   const { id } = req.params;
   const bookIndex = books.findIndex((book) => book.id === id);
 
   if (bookIndex !== -1) {
     books.splice(bookIndex, 1);
-    res.status(200);
-    res.json({ status: "ok" });
+    callbackSuccess();
   } else {
-    return res.status(404).json({ message: "Book not found" });
+    callbackError();
   }
+};
+
+const deleteById = (req, res) => {
+  const { books } = booksStore;
+
+  deleteBase(
+    req,
+    res,
+    () => {
+      res.status(200);
+      res.json({ status: "ok" });
+    },
+    () => res.status(404).json({ message: "Book not found" }),
+  );
 };
 
 module.exports = {
@@ -123,5 +136,6 @@ module.exports = {
   createBase,
   create,
   update,
+  deleteBase,
   deleteById,
 };
