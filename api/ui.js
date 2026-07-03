@@ -62,7 +62,7 @@ const deleteById = (req, res) => {
       res.redirect("/");
     },
     () => {
-      res.status(404).json({ message: "Book not found" });
+      res.redirect("/404");
     },
   );
 };
@@ -76,9 +76,16 @@ const updateFormSubmit = (req, res) => {
       res.redirect(`/book/${book.id}`);
     },
     () => {
-      res.status(404).json({ message: "Book not found" });
+      res.redirect("/404");
     },
   );
+};
+
+const error404 = (req, res) => {
+  res.render("main", {
+    title: "Page Not Found",
+    content: "errors/404",
+  });
 };
 
 module.exports = {
@@ -89,4 +96,5 @@ module.exports = {
   updateForm,
   updateFormSubmit,
   deleteById,
+  error404,
 };

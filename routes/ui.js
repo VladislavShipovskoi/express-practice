@@ -14,5 +14,6 @@ router.post(
 );
 router.get("/book/:id", uiApi.view);
 router.get("/book/:id/delete", uiApi.deleteById);
+router.get("/404", uiApi.error404);
 
 module.exports = router;
