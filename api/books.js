@@ -34,8 +34,7 @@ const downloadById = (req, res) => {
   }
 };
 
-const create = (req, res) => {
-  const { books } = booksStore;
+const createBase = (req) => {
   const { title, description, authors, favorite, fileCover, fileName } =
     req.body;
   let newBook = {};
@@ -63,6 +62,12 @@ const create = (req, res) => {
     );
   }
 
+  return newBook;
+};
+
+const create = (req, res) => {
+  const { books } = booksStore;
+  const newBook = createBase(req);
   books.push(newBook);
   res.status(201);
   res.json(newBook);
@@ -111,4 +116,12 @@ const deleteById = (req, res) => {
   }
 };
 
-module.exports = { getAll, getById, downloadById, create, update, deleteById };
+module.exports = {
+  getAll,
+  getById,
+  downloadById,
+  createBase,
+  create,
+  update,
+  deleteById,
+};
