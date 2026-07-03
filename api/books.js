@@ -73,7 +73,7 @@ const create = (req, res) => {
   res.json(newBook);
 };
 
-const update = (req, res) => {
+const updateBase = (req, res, callbackSuccess, callbackError) => {
   const { books } = booksStore;
   const { id } = req.params;
   const bookIndex = books.findIndex((book) => book.id === id);
@@ -89,20 +89,33 @@ const update = (req, res) => {
       updateData.fileBook = path;
     }
 
-    console.log("updateData", updateData);
-
     books[bookIndex] = {
       ...books[bookIndex],
       ...updateData,
     };
 
-    res.json(books[bookIndex]);
+    callbackSuccess(books[bookIndex], bookIndex);
   } else {
-    res.status(404).json({ message: "Book not found" });
+    callbackError();
   }
 };
 
-const deleteBase = (req, res, callbackSuccess, callbackError) => {
+const update = (req, res) => {
+  const { books } = booksStore;
+
+  updateBase(
+    req,
+    res,
+    (book, bookIndex) => {
+      res.json(books[bookIndex]);
+    },
+    () => {
+      res.status(404).json({ message: "Book not found" });
+    },
+  );
+};
+
+const deleteByIdBase = (req, res, callbackSuccess, callbackError) => {
   const { books } = booksStore;
   const { id } = req.params;
   const bookIndex = books.findIndex((book) => book.id === id);
@@ -135,7 +148,8 @@ module.exports = {
   downloadById,
   createBase,
   create,
+  updateBase,
   update,
-  deleteBase,
+  deleteByIdBase,
   deleteById,
 };

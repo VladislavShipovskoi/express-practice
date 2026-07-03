@@ -1,12 +1,12 @@
 const { books: booksStore } = require("../store");
 const { Book } = require("../entity");
-const { createBase, deleteBase } = require("./books");
+const { createBase, deleteByIdBase, updateBase } = require("./books");
 
 const index = (req, res) => {
   const { books } = booksStore;
 
   res.render("main", {
-    title: "Library",
+    title: "Book List",
     content: "books/list",
     books: books,
   });
@@ -14,8 +14,24 @@ const index = (req, res) => {
 
 const createForm = (req, res) => {
   res.render("main", {
-    title: "Create book",
-    content: "books/create",
+    title: "Create Book",
+    content: "books/form",
+    book: {},
+    action: "/book/create",
+  });
+};
+
+const updateForm = (req, res) => {
+  const { books } = booksStore;
+  const bookId = req.params.id;
+  const book = books.find((book) => book.id === bookId);
+
+  res.render("main", {
+    title: "Update Book",
+    content: "books/form",
+    book: book,
+    action: `/book/${book.id}/update`,
+    update: true,
   });
 };
 
@@ -32,14 +48,14 @@ const view = (req, res) => {
   const book = books.find((book) => book.id === bookId);
 
   res.render("main", {
-    title: "Book details",
+    title: "Book Details",
     content: "books/view",
     book: book,
   });
 };
 
 const deleteById = (req, res) => {
-  deleteBase(
+  deleteByIdBase(
     req,
     res,
     () => {
@@ -51,4 +67,26 @@ const deleteById = (req, res) => {
   );
 };
 
-module.exports = { index, view, createForm, createFormSubmit, deleteById };
+const updateFormSubmit = (req, res) => {
+  const { books } = booksStore;
+  updateBase(
+    req,
+    res,
+    (book) => {
+      res.redirect(`/book/${book.id}`);
+    },
+    () => {
+      res.status(404).json({ message: "Book not found" });
+    },
+  );
+};
+
+module.exports = {
+  index,
+  view,
+  createForm,
+  createFormSubmit,
+  updateForm,
+  updateFormSubmit,
+  deleteById,
+};
