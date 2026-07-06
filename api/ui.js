@@ -26,6 +26,12 @@ const updateForm = (req, res) => {
   const bookId = req.params.id;
   const book = books.find((book) => book.id === bookId);
 
+  if (!book)
+    return res.render("main", {
+      title: "Page Not Found",
+      content: "errors/404",
+    });
+
   res.render("main", {
     title: "Update Book",
     content: "books/form",
@@ -47,6 +53,12 @@ const view = (req, res) => {
   const bookId = req.params.id;
   const book = books.find((book) => book.id === bookId);
 
+  if (!book)
+    return res.render("main", {
+      title: "Page Not Found",
+      content: "errors/404",
+    });
+
   res.render("main", {
     title: "Book Details",
     content: "books/view",
@@ -62,7 +74,10 @@ const deleteById = (req, res) => {
       res.redirect("/");
     },
     () => {
-      res.redirect("/404");
+      return res.render("main", {
+        title: "Page Not Found",
+        content: "errors/404",
+      });
     },
   );
 };
@@ -76,16 +91,12 @@ const updateFormSubmit = (req, res) => {
       res.redirect(`/book/${book.id}`);
     },
     () => {
-      res.redirect("/404");
+      return res.render("main", {
+        title: "Page Not Found",
+        content: "errors/404",
+      });
     },
   );
-};
-
-const error404 = (req, res) => {
-  res.render("main", {
-    title: "Page Not Found",
-    content: "errors/404",
-  });
 };
 
 module.exports = {
@@ -96,5 +107,4 @@ module.exports = {
   updateForm,
   updateFormSubmit,
   deleteById,
-  error404,
 };

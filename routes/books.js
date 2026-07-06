@@ -11,9 +11,23 @@ router.get("/:id", booksApi.getById);
 
 router.get("/:id/download", booksApi.downloadById);
 
-router.post("/", fileUpload.single("img"), booksApi.create);
+router.post(
+  "/",
+  fileUpload.fields([
+    { name: "fileCover", maxCount: 1 },
+    { name: "fileBook", maxCount: 1 },
+  ]),
+  booksApi.create,
+);
 
-router.put("/:id", fileUpload.single("img"), booksApi.update);
+router.put(
+  "/:id",
+  fileUpload.fields([
+    { name: "fileCover", maxCount: 1 },
+    { name: "fileBook", maxCount: 1 },
+  ]),
+  booksApi.update,
+);
 
 router.delete("/:id", booksApi.deleteById);
 

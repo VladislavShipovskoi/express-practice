@@ -5,15 +5,26 @@ const { uiApi, booksApi } = require("../api");
 
 router.get("/", uiApi.index);
 router.get("/book/create", uiApi.createForm);
-router.post("/book/create", fileUpload.single("img"), uiApi.createFormSubmit);
+
+router.post(
+  "/book/create",
+  fileUpload.fields([
+    { name: "fileCover", maxCount: 1 },
+    { name: "fileBook", maxCount: 1 },
+  ]),
+  uiApi.createFormSubmit,
+);
+
 router.get("/book/:id/update", uiApi.updateForm);
 router.post(
   "/book/:id/update",
-  fileUpload.single("img"),
+  fileUpload.fields([
+    { name: "fileCover", maxCount: 1 },
+    { name: "fileBook", maxCount: 1 },
+  ]),
   uiApi.updateFormSubmit,
 );
 router.get("/book/:id", uiApi.view);
 router.get("/book/:id/delete", uiApi.deleteById);
-router.get("/404", uiApi.error404);
 
 module.exports = router;

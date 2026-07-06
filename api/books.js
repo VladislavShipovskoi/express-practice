@@ -39,28 +39,36 @@ const createBase = (req) => {
     req.body;
   let newBook = {};
 
-  if (req.file) {
-    const { path, filename } = req.file;
+  let data = {
+    title,
+    description,
+    authors,
+    favorite,
+  };
 
-    newBook = new Book(
-      title,
-      description,
-      authors,
-      favorite,
-      fileCover,
-      filename,
-      path,
-    );
-  } else {
-    newBook = new Book(
-      title,
-      description,
-      authors,
-      favorite,
-      fileCover,
-      fileName,
-    );
+  if (req.files) {
+    const fileCover = req.files["fileCover"];
+    const fileBook = req.files["fileBook"];
+
+    if (fileCover) {
+      data.fileCover = fileCover[0].path;
+    }
+
+    if (fileBook) {
+      data.fileName = fileBook[0].filename;
+      data.fileBook = fileBook[0].path;
+    }
   }
+
+  newBook = new Book(
+    data.title,
+    data.description,
+    data.authors,
+    data.favorite,
+    data.fileCover,
+    data.fileName,
+    data.fileBook,
+  );
 
   return newBook;
 };
@@ -83,10 +91,18 @@ const updateBase = (req, res, callbackSuccess, callbackError) => {
 
     const updateData = bodyData;
 
-    if (req.file) {
-      const { path, filename } = req.file;
-      updateData.fileName = filename;
-      updateData.fileBook = path;
+    if (req.files) {
+      const fileCover = req.files["fileCover"];
+      const fileBook = req.files["fileBook"];
+
+      if (fileCover) {
+        updateData.fileCover = fileCover[0].path;
+      }
+
+      if (fileBook) {
+        updateData.fileName = fileBook[0].filename;
+        updateData.fileBook = fileBook[0].path;
+      }
     }
 
     books[bookIndex] = {
