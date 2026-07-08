@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { userApi } = require("../api");
+const { userApi } = require("../../../api");
 
 router.get("/login", userApi.login);
 

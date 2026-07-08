@@ -1,7 +1,7 @@
 const path = require("path");
 const express = require("express");
-const { booksApi } = require("../api");
-const { fileUpload } = require("../middleware");
+const { booksApi } = require("../../../api");
+const { fileUpload } = require("../../../middleware");
 
 const router = express.Router();
 

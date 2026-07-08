@@ -1,6 +1,6 @@
 const express = require("express");
 const { logger, error404, error } = require("./middleware");
-const { userRouter, booksRouter, uiRouter } = require("./routes");
+const { userRouter, bookRouter, uiRouter } = require("./routes");
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -11,7 +11,7 @@ app.use(logger);
 app.use("/public", express.static(__dirname + "/public"));
 app.use("/", uiRouter);
 app.use("/api/user", userRouter);
-app.use("/api/books", booksRouter);
+app.use("/api/books", bookRouter);
 app.use(error404);
 app.use(error);
 
