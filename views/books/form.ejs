@@ -1,0 +1,103 @@
+<div class="max-w-6xl mx-auto bg-white shadow-lg rounded-xl p-6 sm:p-10">
+  <h1 class="text-3xl font-bold text-gray-900 mb-6 border-b pb-2">
+    <%= title %>
+  </h1>
+
+  <form
+    action="<%= action %>"
+    method="POST"
+    enctype="multipart/form-data"
+    class="space-y-6"
+  >
+    <div>
+      <label for="title" class="block text-sm font-medium text-gray-700 mb-1"
+        >Title</label
+      >
+      <input
+        type="text"
+        name="title"
+        id="title"
+        value="<%= book.title %>"
+        required
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+      />
+    </div>
+
+    <div>
+      <label for="authors" class="block text-sm font-medium text-gray-700 mb-1"
+        >Authors</label
+      >
+      <input
+        type="text"
+        name="authors"
+        value="<%= book.authors %>"
+        id="authors"
+        required
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+      />
+    </div>
+
+    <div>
+      <label
+        for="description"
+        class="block text-sm font-medium text-gray-700 mb-1"
+        >Description</label
+      >
+      <textarea
+        name="description"
+        id="description"
+        rows="4"
+        required
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+      >
+        <%= book.description %>
+      </textarea>
+    </div>
+
+    <div class="flex items-center">
+      <input
+        id="favorite"
+        name="favorite"
+        type="checkbox"
+        <%= book.favorite ? "checked" : "" %>
+        class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+      />
+      <label for="favorite" class="ml-2 block text-sm text-gray-900"
+        >Mark as favorite</label
+      >
+    </div>
+
+    <div flex items-center>
+      <label for="fileCover" class="block text-sm font-medium text-gray-700 mb-1"
+        >File Cover</label
+      >
+      <input
+        type="file"
+        name="fileCover"
+        id="fileCover"
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+      />
+    </div>
+
+    <div flex items-center>
+      <label for="fileBook" class="block text-sm font-medium text-gray-700 mb-1"
+        >File Book</label
+      >
+      <input
+        type="file"
+        name="fileBook"
+        id="fileBook"
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg"
+      />
+    </div>
+
+    <div class="pt-6 flex justify-end">
+      <button
+        type="submit"
+        class="px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 cursor-pointer"
+      >
+        Save book
+      </button>
+    </div>
+  </form>
+</div>
