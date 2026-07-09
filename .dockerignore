@@ -1,0 +1,7 @@
+counter-service
+node_modules
+.git
+.gitignore
+*.log
+*.env
+*.txt
