@@ -2,6 +2,9 @@ const { books: booksStore } = require("../store");
 const { Book } = require("../entity");
 const { createBase, deleteByIdBase, updateBase } = require("./books");
 
+const COUNTER_SERVICE_URL =
+  process.env.COUNTER_SERVICE_URL || "http://localhost:3001";
+
 const index = (req, res) => {
   const { books } = booksStore;
 
@@ -48,7 +51,7 @@ const createFormSubmit = (req, res) => {
   res.redirect("/");
 };
 
-const view = (req, res) => {
+const view = async (req, res) => {
   const { books } = booksStore;
   const bookId = req.params.id;
   const book = books.find((book) => book.id === bookId);
@@ -59,11 +62,33 @@ const view = (req, res) => {
       content: "errors/404",
     });
 
-  res.render("main", {
+  const renderContex = {
     title: "Book Details",
     content: "books/view",
     book: book,
-  });
+  };
+
+  try {
+    await fetch(`${COUNTER_SERVICE_URL}/counter/${bookId}/incr`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const getCountResponse = await fetch(
+      `${COUNTER_SERVICE_URL}/counter/${bookId}`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+
+    const data = await getCountResponse.json();
+    renderContex.count = data.count;
+  } catch (error) {
+    renderContex.count = null;
+  }
+
+  res.render("main", renderContex);
 };
 
 const deleteById = (req, res) => {

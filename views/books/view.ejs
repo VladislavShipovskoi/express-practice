@@ -41,6 +41,9 @@
             <p class="mb-4"><strong class="text-gray-700">Authors: </strong class="sm:text-lg"><%= book.authors %></p>
             <p class="mb-4"><strong class="text-gray-700">Description: </strong class="sm:text-lg"><%= book.description %></p>
             <p class="mb-4"><strong class="text-gray-700">Favorite: </strong class="sm:text-lg"><%= book.favorite ? "Yes" : "No" %></p>
+            <% if (count !== null) { %>
+                <p class="mb-4"><strong class="text-gray-700">Views: </strong class="sm:text-lg"><%= count %></p>
+            <% } %>
         </div>
     </div>
 </div>
