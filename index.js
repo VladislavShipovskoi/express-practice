@@ -15,9 +15,9 @@ app.use("/api/books", bookRouter);
 app.use(error404);
 app.use(error);
 
-async function start(PORT, URL_DB) {
+async function start(PORT, DB_URL) {
   try {
-    await mongoose.connect(URL_DB);
+    await mongoose.connect(DB_URL);
     app.listen(PORT, () => {
       console.log(`Library app listening on port ${PORT}`);
     });
@@ -26,6 +26,6 @@ async function start(PORT, URL_DB) {
   }
 }
 
-const URL_DB = process.env.URL_DB;
+const DB_URL = process.env.DB_URL;
 const PORT = process.env.PORT || 3000;
-start(PORT, URL_DB);
+start(PORT, DB_URL);

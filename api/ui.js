@@ -1,12 +1,18 @@
 const { books: booksStore } = require("../store");
-const { Book } = require("../entity");
-const { createBase, deleteByIdBase, updateBase } = require("./books");
+const {
+  getAllBase,
+  getByIdBase,
+  createBase,
+  deleteByIdBase,
+  updateBase,
+} = require("./books");
+const BookModel = require("../models/Book");
 
 const COUNTER_SERVICE_URL =
   process.env.COUNTER_SERVICE_URL || "http://localhost:3001";
 
-const index = (req, res) => {
-  const { books } = booksStore;
+const index = async (req, res) => {
+  const books = await getAllBase();
 
   res.render("main", {
     title: "Book List",
@@ -15,19 +21,9 @@ const index = (req, res) => {
   });
 };
 
-const createForm = (req, res) => {
-  res.render("main", {
-    title: "Create Book",
-    content: "books/form",
-    book: {},
-    action: "/book/create",
-  });
-};
-
-const updateForm = (req, res) => {
-  const { books } = booksStore;
+const updateForm = async (req, res) => {
   const bookId = req.params.id;
-  const book = books.find((book) => book.id === bookId);
+  const book = await getByIdBase(bookId);
 
   if (!book)
     return res.render("main", {
@@ -44,17 +40,23 @@ const updateForm = (req, res) => {
   });
 };
 
+const createForm = (req, res) => {
+  res.render("main", {
+    title: "Create Book",
+    content: "books/form",
+    book: {},
+    action: "/book/create",
+  });
+};
+
 const createFormSubmit = (req, res) => {
-  const { books } = booksStore;
   const newBook = createBase(req);
-  books.push(newBook);
   res.redirect("/");
 };
 
 const view = async (req, res) => {
-  const { books } = booksStore;
   const bookId = req.params.id;
-  const book = books.find((book) => book.id === bookId);
+  const book = await getByIdBase(bookId);
 
   if (!book)
     return res.render("main", {
@@ -108,7 +110,6 @@ const deleteById = (req, res) => {
 };
 
 const updateFormSubmit = (req, res) => {
-  const { books } = booksStore;
   updateBase(
     req,
     res,
