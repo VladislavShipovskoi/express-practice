@@ -3,6 +3,23 @@ services:
     image: redis
     volumes:
       - ./data:/data
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+      ME_CONFIG_BASICAUTH_ENABLED: true
+      ME_CONFIG_BASICAUTH_USERNAME: mongoexpressuser
+      ME_CONFIG_BASICAUTH_PASSWORD: mongoexpresspass
   counter:
     image: node:24.18.0
     working_dir: /app
@@ -13,7 +30,7 @@ services:
       - REDIS_URL=redis://storage
     ports:
       - 3001:3001
-    command: npm run devц
+    command: npm run dev
     depends_on:
       - storage
   library:
@@ -24,8 +41,10 @@ services:
     environment:
       - PORT=3000
       - COUNTER_SERVICE_URL=http://counter:3001
+      - URL_DB=mongodb+srv://vladislavshipovskoy_db_user:NM8JTBcp6tMq0J6a@cluster0.4rayzgi.mongodb.net
     ports:
       - 80:3000
     command: npm run dev
     depends_on:
       - counter
+      - mongo
