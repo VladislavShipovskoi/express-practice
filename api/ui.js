@@ -125,8 +125,42 @@ const updateFormSubmit = (req, res) => {
   );
 };
 
+const login = (req, res) => {
+  res.render("main", {
+    title: "Login",
+    content: "user/login",
+  });
+};
+
+const register = (req, res) => {
+  res.render("main", {
+    title: "Register",
+    content: "user/register",
+  });
+};
+
+const profile = (req, res) => {
+  res.render("main", {
+    title: "Profile",
+    content: "user/profile",
+  });
+};
+
+const logout = (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+    res.redirect("/");
+  });
+};
+
 module.exports = {
   index,
+  login,
+  register,
+  logout,
+  profile,
   view,
   createForm,
   createFormSubmit,
