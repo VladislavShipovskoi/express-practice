@@ -1,8 +1,8 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const { logger, error404, error } = require("./middleware");
 const { userRouter, bookRouter, uiRouter } = require("./routes");
 
-const PORT = process.env.PORT || 3000;
 const app = express();
 
 app.use(express.json());
@@ -15,6 +15,17 @@ app.use("/api/books", bookRouter);
 app.use(error404);
 app.use(error);
 
-app.listen(PORT, () => {
-  console.log(`Library app listening on port ${PORT}`);
-});
+async function start(PORT, DB_URL) {
+  try {
+    await mongoose.connect(DB_URL);
+    app.listen(PORT, () => {
+      console.log(`Library app listening on port ${PORT}`);
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const DB_URL = process.env.DB_URL;
+const PORT = process.env.PORT || 3000;
+start(PORT, DB_URL);

@@ -1,40 +1,59 @@
 const { books: booksStore } = require("../store");
 const { fileUpload } = require("../middleware");
-const { Book } = require("../entity");
+const BookModel = require("../models/Book");
 
-const getAll = (req, res) => {
-  const { books } = booksStore;
-  res.json(books);
-};
-
-const getById = (req, res) => {
-  const { books } = booksStore;
-  const { id } = req.params;
-  const book = books.find((book) => book.id === id);
-
-  if (book) {
-    res.json(book);
-  } else {
-    res.status(404).json({ message: "Book not found" });
+const getAllBase = async () => {
+  try {
+    const books = await BookModel.find().select("-__v");
+    return books;
+  } catch (e) {
+    throw e;
   }
 };
 
-const downloadById = (req, res) => {
-  const { books } = booksStore;
-  const { id } = req.params;
-  const book = books.find((book) => book.id === id);
-
-  if (book) {
-    res.download(`${book.fileBook}`, book.fileName, (error) => {
-      console.log(error);
-      res.status(404).json();
-    });
-  } else {
-    res.status(404).json({ message: "Book not found" });
+const getByIdBase = async (id) => {
+  try {
+    const book = await BookModel.findById(id).select("-__v");
+    return book;
+  } catch (e) {
+    throw e;
   }
 };
 
-const createBase = (req) => {
+const updateBase = async (req, res, callbackSuccess, callbackError) => {
+  const { id } = req.params;
+
+  try {
+    const book = await getByIdBase(id);
+
+    if (book.id) {
+      const { id: _, ...bodyData } = req.body;
+
+      if (req.files) {
+        const fileCover = req.files["fileCover"];
+        const fileBook = req.files["fileBook"];
+
+        if (fileCover) {
+          bodyData.fileCover = fileCover[0].path;
+        }
+
+        if (fileBook) {
+          bodyData.fileName = fileBook[0].filename;
+          bodyData.fileBook = fileBook[0].path;
+        }
+      }
+
+      const updatedBook = await BookModel.findByIdAndUpdate(id, bodyData);
+      callbackSuccess(updatedBook);
+    } else {
+      callbackError();
+    }
+  } catch (e) {
+    throw e;
+  }
+};
+
+const createBase = async (req) => {
   const { title, description, authors, favorite, fileCover, fileName } =
     req.body;
   let newBook = {};
@@ -60,112 +79,136 @@ const createBase = (req) => {
     }
   }
 
-  newBook = new Book(
-    data.title,
-    data.description,
-    data.authors,
-    data.favorite,
-    data.fileCover,
-    data.fileName,
-    data.fileBook,
-  );
+  newBook = new BookModel({
+    title: data.title,
+    description: data.description,
+    authors: data.authors,
+    favorite: data.favorite,
+    fileCover: data.fileCover,
+    fileName: data.fileName,
+    fileBook: data.fileBook,
+  });
 
-  return newBook;
+  try {
+    await newBook.save();
+    return newBook;
+  } catch (e) {
+    throw e;
+  }
+};
+
+const deleteByIdBase = async (req, res, callbackSuccess, callbackError) => {
+  const { id } = req.params;
+
+  try {
+    const book = await getByIdBase(id);
+
+    if (book) {
+      await BookModel.deleteOne({ _id: id });
+      callbackSuccess();
+    } else {
+      callbackError();
+    }
+  } catch (e) {
+    throw e;
+  }
+};
+
+const getAll = async (req, res) => {
+  try {
+    const books = await getAllBase(req);
+    res.json(books);
+  } catch (e) {
+    res.status(500).json(e);
+  }
+};
+
+const getById = (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const book = getByIdBase(id);
+
+    if (book) {
+      res.json(book);
+    } else {
+      res.status(404).json({ message: "Book not found" });
+    }
+  } catch (e) {
+    res.status(500).json(e);
+  }
+};
+
+const downloadById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const book = await getByIdBase(id);
+
+    if (book) {
+      res.download(`${book.fileBook}`, book.fileName, (error) => {
+        res.status(404).json();
+      });
+    } else {
+      res.status(404).json({ message: "Book not found" });
+    }
+  } catch (e) {
+    res.status(500).json(e);
+  }
 };
 
 const create = (req, res) => {
-  const { books } = booksStore;
-  const newBook = createBase(req);
-  books.push(newBook);
-  res.status(201);
-  res.json(newBook);
-};
-
-const updateBase = (req, res, callbackSuccess, callbackError) => {
-  const { books } = booksStore;
-  const { id } = req.params;
-  const bookIndex = books.findIndex((book) => book.id === id);
-
-  if (bookIndex !== -1) {
-    const { id: _, ...bodyData } = req.body;
-
-    const updateData = bodyData;
-
-    if (req.files) {
-      const fileCover = req.files["fileCover"];
-      const fileBook = req.files["fileBook"];
-
-      if (fileCover) {
-        updateData.fileCover = fileCover[0].path;
-      }
-
-      if (fileBook) {
-        updateData.fileName = fileBook[0].filename;
-        updateData.fileBook = fileBook[0].path;
-      }
-    }
-
-    books[bookIndex] = {
-      ...books[bookIndex],
-      ...updateData,
-    };
-
-    callbackSuccess(books[bookIndex], bookIndex);
-  } else {
-    callbackError();
+  try {
+    const newBook = createBase(req);
+    res.status(201).json(newBook);
+  } catch (e) {
+    res.status(500).json(e);
   }
 };
 
 const update = (req, res) => {
-  const { books } = booksStore;
-
-  updateBase(
-    req,
-    res,
-    (book, bookIndex) => {
-      res.json(books[bookIndex]);
-    },
-    () => {
-      res.status(404).json({ message: "Book not found" });
-    },
-  );
-};
-
-const deleteByIdBase = (req, res, callbackSuccess, callbackError) => {
-  const { books } = booksStore;
-  const { id } = req.params;
-  const bookIndex = books.findIndex((book) => book.id === id);
-
-  if (bookIndex !== -1) {
-    books.splice(bookIndex, 1);
-    callbackSuccess();
-  } else {
-    callbackError();
+  try {
+    updateBase(
+      req,
+      res,
+      (book) => {
+        res.json(book);
+      },
+      () => {
+        res.status(404).json({ message: "Book not found" });
+      },
+    );
+  } catch (e) {
+    res.status(500).json(e);
   }
 };
 
 const deleteById = (req, res) => {
-  const { books } = booksStore;
-
-  deleteBase(
-    req,
-    res,
-    () => {
-      res.status(200);
-      res.json({ status: "ok" });
-    },
-    () => res.status(404).json({ message: "Book not found" }),
-  );
+  try {
+    deleteByIdBase(
+      req,
+      res,
+      () => {
+        res.status(200);
+        res.json({ status: "ok" });
+      },
+      () => res.status(404).json({ message: "Book not found" }),
+    );
+  } catch (e) {
+    res.status(500).json(e);
+  }
 };
 
 module.exports = {
+  getAllBase,
+  getByIdBase,
+  updateBase,
+  createBase,
+  deleteByIdBase,
   getAll,
   getById,
   downloadById,
-  createBase,
-  create,
-  updateBase,
   update,
-  deleteByIdBase,
+  create,
   deleteById,
 };
