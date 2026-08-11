@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
 
-const { userApi } = require("../../../api");
+const { authApi } = require("../../../api");
 
-router.get("/login", userApi.login);
+router.post("/login", authApi.login);
+router.post("/register", authApi.register);
 
 module.exports = router;
