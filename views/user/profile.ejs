@@ -1,74 +1,37 @@
 <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-xl p-6 sm:p-10">
-    <!-- Верхний заголовок системы -->
-    <h1 class="text-3xl font-bold text-gray-900 mb-6 border-b pb-2">Library</h1>
-    
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 pt-4 gap-4">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
             <h2 class="text-2xl font-semibold text-gray-700"><%= title %></h2>
-            <p class="text-sm text-gray-500 mt-1">Manage your account settings and preferences</p>
         </div>
-        <a href="/" class="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg transition duration-150">
-            ← Back to Library
-        </a>
     </div>
 
     <% if (currentUser) { %>
-        <!-- Карточка пользователя -->
         <div class="flex flex-col md:flex-row items-center gap-6 pb-8 border-b border-gray-100">
-            <!-- Аватар на основе первой буквы имени -->
             <div class="h-24 w-24 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 text-4xl font-bold shadow-inner">
                 <%= currentUser.username.charAt(0).toUpperCase() %>
             </div>
             
             <div class="text-center md:text-left">
                 <h3 class="text-xl font-bold text-gray-900"><%= currentUser.username %></h3>
-                <p class="text-sm text-gray-500">Registered Reader</p>
             </div>
         </div>
 
-        <!-- Подробная информация -->
         <div class="mt-8">
             <div class="space-y-6">
-                <!-- Строка: Имя пользователя -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 py-4 border-b border-gray-100">
                     <div class="text-sm font-medium text-gray-500">Username</div>
                     <div class="text-sm text-gray-900 sm:col-span-2 mt-1 sm:mt-0 font-semibold"><%= currentUser.username %></div>
                 </div>
 
-                <!-- Строка: Email -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 py-4 border-b border-gray-100">
                     <div class="text-sm font-medium text-gray-500">Email Address</div>
                     <div class="text-sm text-gray-900 sm:col-span-2 mt-1 sm:mt-0">
                         <%= currentUser.email ? currentUser.email : 'Not provided' %>
                     </div>
                 </div>
-
-                <!-- Строка: Статус аккаунта -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 py-4 border-b border-gray-100">
-                    <div class="text-sm font-medium text-gray-500">Account Status</div>
-                    <div class="sm:col-span-2 mt-1 sm:mt-0">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            Active
-                        </span>
-                    </div>
-                </div>
             </div>
-        </div>
-
-        <!-- Кнопки действий -->
-        <div class="mt-10 flex flex-wrap gap-4 justify-between items-center">
-            <div class="flex gap-3">
-                <button class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition duration-150 font-medium cursor-pointer">
-                    Edit Profile
-                </button>
-            </div>
-            
-            <a href="/logout" class="px-4 py-2 text-sm font-semibold text-red-600 hover:text-red-800 transition duration-150">
-                Sign Out
-            </a>
         </div>
     <% } else { %>
-        <!-- Заглушка, если профиль запрашивается неавторизованным пользователем -->
         <div class="p-12 text-center bg-gray-50 rounded-lg border border-dashed border-gray-300">
             <h2 class="text-xl font-semibold text-gray-600 mb-2">Access Denied</h2>
             <p class="text-gray-400 mb-6">Please log in to view your profile page.</p>

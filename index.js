@@ -5,7 +5,7 @@ const LocalStrategy = require("passport-local").Strategy;
 const session = require("express-session");
 const User = require("./models/User");
 const { logger, error404, error, isLoggedIn } = require("./middleware");
-const { userRouter, bookRouter, uiRouter } = require("./routes");
+const { apiBookRouter, uiUserRouter, uiBookRouter } = require("./routes");
 
 const app = express();
 
@@ -36,9 +36,9 @@ app.use((req, res, next) => {
 app.use(logger);
 app.use("/public", express.static(__dirname + "/public"));
 
-app.use("/", uiRouter);
-app.use("/api/user", userRouter);
-app.use("/api/books", bookRouter);
+app.use("/", uiUserRouter);
+app.use("/", uiBookRouter);
+app.use("/api/books", apiBookRouter);
 app.use(error404);
 app.use(error);
 

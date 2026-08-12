@@ -6,7 +6,6 @@ const {
   deleteByIdBase,
   updateBase,
 } = require("./books");
-const BookModel = require("../models/Book");
 
 const COUNTER_SERVICE_URL =
   process.env.COUNTER_SERVICE_URL || "http://localhost:3001";
@@ -129,6 +128,7 @@ const login = (req, res) => {
   res.render("main", {
     title: "Login",
     content: "user/login",
+    hideNavbar: true,
   });
 };
 
@@ -136,6 +136,7 @@ const register = (req, res) => {
   res.render("main", {
     title: "Register",
     content: "user/register",
+    hideNavbar: true,
   });
 };
 
@@ -146,20 +147,10 @@ const profile = (req, res) => {
   });
 };
 
-const logout = (req, res) => {
-  req.logout((err) => {
-    if (err) {
-      return next(err);
-    }
-    res.redirect("/");
-  });
-};
-
 module.exports = {
   index,
   login,
   register,
-  logout,
   profile,
   view,
   createForm,

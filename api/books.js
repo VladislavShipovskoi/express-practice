@@ -1,10 +1,10 @@
 const { books: booksStore } = require("../store");
 const { fileUpload } = require("../middleware");
-const BookModel = require("../models/Book");
+const { Book } = require("../models/");
 
 const getAllBase = async () => {
   try {
-    const books = await BookModel.find().select("-__v");
+    const books = await Book.find().select("-__v");
     return books;
   } catch (e) {
     throw e;
@@ -79,7 +79,7 @@ const createBase = async (req) => {
     }
   }
 
-  newBook = new BookModel({
+  newBook = new Book({
     title: data.title,
     description: data.description,
     authors: data.authors,

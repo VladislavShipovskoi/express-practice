@@ -4,6 +4,7 @@ const fileUpload = require("./file");
 const error = require("./error");
 const isLoggedIn = require("./isLoggedIn");
 const isLoggedOut = require("./isLoggedOut");
+const isApiAuthenticated = require("./isApiAuthenticated");
 
 module.exports = {
   error404,
@@ -12,4 +13,5 @@ module.exports = {
   error,
   isLoggedIn,
   isLoggedOut,
+  isApiAuthenticated,
 };
