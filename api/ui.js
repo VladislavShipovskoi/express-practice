@@ -6,7 +6,6 @@ const {
   deleteByIdBase,
   updateBase,
 } = require("./books");
-const BookModel = require("../models/Book");
 
 const COUNTER_SERVICE_URL =
   process.env.COUNTER_SERVICE_URL || "http://localhost:3001";
@@ -125,8 +124,34 @@ const updateFormSubmit = (req, res) => {
   );
 };
 
+const login = (req, res) => {
+  res.render("main", {
+    title: "Login",
+    content: "user/login",
+    hideNavbar: true,
+  });
+};
+
+const register = (req, res) => {
+  res.render("main", {
+    title: "Register",
+    content: "user/register",
+    hideNavbar: true,
+  });
+};
+
+const profile = (req, res) => {
+  res.render("main", {
+    title: "Profile",
+    content: "user/profile",
+  });
+};
+
 module.exports = {
   index,
+  login,
+  register,
+  profile,
   view,
   createForm,
   createFormSubmit,

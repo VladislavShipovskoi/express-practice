@@ -1,0 +1,43 @@
+<div class="max-w-4xl mx-auto bg-white shadow-lg rounded-xl p-6 sm:p-10">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <div>
+            <h2 class="text-2xl font-semibold text-gray-700"><%= title %></h2>
+        </div>
+    </div>
+
+    <% if (currentUser) { %>
+        <div class="flex flex-col md:flex-row items-center gap-6 pb-8 border-b border-gray-100">
+            <div class="h-24 w-24 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 text-4xl font-bold shadow-inner">
+                <%= currentUser.username.charAt(0).toUpperCase() %>
+            </div>
+            
+            <div class="text-center md:text-left">
+                <h3 class="text-xl font-bold text-gray-900"><%= currentUser.username %></h3>
+            </div>
+        </div>
+
+        <div class="mt-8">
+            <div class="space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-3 py-4 border-b border-gray-100">
+                    <div class="text-sm font-medium text-gray-500">Username</div>
+                    <div class="text-sm text-gray-900 sm:col-span-2 mt-1 sm:mt-0 font-semibold"><%= currentUser.username %></div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 py-4 border-b border-gray-100">
+                    <div class="text-sm font-medium text-gray-500">Email Address</div>
+                    <div class="text-sm text-gray-900 sm:col-span-2 mt-1 sm:mt-0">
+                        <%= currentUser.email ? currentUser.email : 'Not provided' %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } else { %>
+        <div class="p-12 text-center bg-gray-50 rounded-lg border border-dashed border-gray-300">
+            <h2 class="text-xl font-semibold text-gray-600 mb-2">Access Denied</h2>
+            <p class="text-gray-400 mb-6">Please log in to view your profile page.</p>
+            <a href="/login" class="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-150">
+                Log In
+            </a>
+        </div>
+    <% } %>
+</div>

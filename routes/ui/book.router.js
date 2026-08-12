@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const fileUpload = require("../../middleware/file");
+const { fileUpload, isLoggedIn } = require("../../middleware");
 const { uiApi, booksApi } = require("../../api");
 
+router.use(isLoggedIn);
 router.get("/", uiApi.index);
 router.get("/book/create", uiApi.createForm);
 
