@@ -1,5 +1,5 @@
-const userRouter = require("./api/user/user.router");
-const bookRouter = require("./api/book/book.router");
-const uiRouter = require("./view/ui.router");
+const apiBookRouter = require("./api/book/book.router");
+const uiUserRouter = require("./ui/user.router");
+const uiBookRouter = require("./ui/book.router");
 
-module.exports = { userRouter, bookRouter, uiRouter };
+module.exports = { apiBookRouter, uiUserRouter, uiBookRouter };

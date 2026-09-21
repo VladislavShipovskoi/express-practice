@@ -7,9 +7,48 @@
 
     <title><%= title %></title>
   </head>
-  <body class="bg-gray-50">
-    <main>
-      <div class="p-8"><%- include(content) %></div>
-    </main>
+  <body class="bg-gray-50 min-h-screen flex flex-col font-sans">
+
+  <% if (!locals.hideNavbar) { %>
+  <header class="bg-white border-b border-gray-200 shadow-xs sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-2.5 text-xl font-bold text-gray-900 hover:opacity-90 transition duration-150">
+        <span class="h-8 w-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-extrabold text-sm shadow-sm">L</span>
+        <span>Library</span>
+      </a>
+
+      <div class="flex items-center gap-4">
+        <% if (currentUser) { %>
+          <div class="flex items-center gap-3">
+            <a href="/profile" class="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 border border-gray-200 hover:border-gray-300 rounded-full py-1 pl-3.5 pr-3.5 shadow-2xs transition duration-150 cursor-pointer">
+              <span class="text-sm font-medium text-gray-700 max-w-[120px] truncate">
+                <%= currentUser.username %>
+              </span>
+            </a>
+            <a href="/logout" class="px-3.5 py-1.5 text-sm font-semibold text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition duration-150">
+              Выйти
+            </a>
+          </div>
+        <% } else { %>
+          <div class="flex items-center gap-2">
+            <a href="/login" class="px-3.5 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 transition duration-150">
+              Войти
+            </a>
+            <a href="/register" class="px-4 py-2 text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition duration-150 shadow-xs">
+              Регистрация
+            </a>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </header>
+  <% } %>
+
+  <main class="flex-grow py-10 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto">
+      <%- include(content) %>
+    </div>
+  </main>
+
   </body>
 </html>

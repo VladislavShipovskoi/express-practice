@@ -1,5 +1,5 @@
-const userApi = require("./user");
+const authApi = require("./auth");
 const booksApi = require("./books");
 const uiApi = require("./ui");
 
-module.exports = { userApi, booksApi, uiApi };
+module.exports = { authApi, booksApi, uiApi };
