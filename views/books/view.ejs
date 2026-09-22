@@ -44,4 +44,170 @@
             <% } %>
         </div>
     </div>
+
+    <div class="mt-8 pt-8 border-t border-gray-200 flex flex-col gap-4">
+    <div class="flex items-center justify-between">
+      <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+        <svg
+          class="w-6 h-6 text-indigo-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+          ></path>
+        </svg>
+        Обсуждение книги
+      </h3>
+    </div>
+
+    <div
+      id="chat"
+      class="h-80 overflow-y-auto bg-gray-50 p-4 rounded-xl border border-gray-200 flex flex-col gap-3"
+    ></div>
+
+    <div
+      class="flex flex-col gap-3 bg-gray-50 p-4 rounded-xl border border-gray-200"
+    >
+      <textarea
+        id="message"
+        rows="3"
+        placeholder="Напишите мысль о прочитанном... (Enter — отправить, Shift+Enter — новая строка)"
+        class="w-full p-3 bg-white border border-gray-300 rounded-lg text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-150 resize-y"
+      ></textarea>
+
+      <div class="flex justify-end">
+        <button
+          onclick="sendMessage()"
+          class="px-5 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg shadow hover:bg-indigo-700 active:scale-95 transition duration-150 cursor-pointer flex items-center gap-2"
+        >
+          <span>Отправить</span>
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M14 5l7 7m0 0l-7 7m7-7H3"
+            ></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div
+    id="data"
+    data-book-id="<%= book.id %>"
+    data-user="<%= currentUser.username %>"
+  ></div>
+
+  <script>
+    const dataContainer = document.getElementById("data");
+    const bookId = dataContainer.dataset.bookId;
+    const currentUsername = dataContainer.dataset.user;
+
+    const socket = io();
+    const chatDiv = document.getElementById("chat");
+    const msgInput = document.getElementById("message");
+
+    socket.on("connect", () => {
+      socket.emit("joinBookRoom", bookId);
+    });
+
+    socket.on("newComment", (msg) => {
+      const authorName =
+        typeof msg.user === "object" && msg.user !== null
+          ? msg.user.username || msg.user.name || "Аноним"
+          : msg.user || "Аноним";
+
+      const isMe = authorName === currentUsername;
+      const msgElement = document.createElement("div");
+
+      if (isMe) {
+        msgElement.className =
+          "self-end max-w-[80%] bg-indigo-600 text-white p-3 rounded-2xl rounded-tr-none shadow-sm flex flex-col gap-1 transition duration-150";
+
+        const textDiv = document.createElement("div");
+        textDiv.className =
+          "text-sm whitespace-pre-wrap break-words leading-relaxed";
+        textDiv.textContent = msg.text;
+
+        const timeSpan = document.createElement("span");
+        timeSpan.className = "text-indigo-200 text-[10px] self-end mt-0.5";
+        timeSpan.textContent =
+          msg.time ||
+          new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
+        msgElement.appendChild(textDiv);
+        msgElement.appendChild(timeSpan);
+      } else {
+        msgElement.className =
+          "self-start max-w-[80%] bg-white p-3 rounded-2xl rounded-tl-none border border-gray-200 shadow-sm flex flex-col gap-1 transition duration-150";
+
+        const headerDiv = document.createElement("div");
+        headerDiv.className =
+          "flex justify-between items-center gap-3 text-xs mb-0.5";
+
+        const authorSpan = document.createElement("span");
+        authorSpan.className = "font-bold text-indigo-600 text-[13px]";
+        authorSpan.textContent = authorName;
+
+        const timeSpan = document.createElement("span");
+        timeSpan.className = "text-gray-400 text-[10px]";
+        timeSpan.textContent =
+          msg.time ||
+          new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
+        headerDiv.appendChild(authorSpan);
+        headerDiv.appendChild(timeSpan);
+
+        const textDiv = document.createElement("div");
+        textDiv.className =
+          "text-gray-800 text-sm whitespace-pre-wrap break-words leading-relaxed";
+        textDiv.textContent = msg.text;
+
+        msgElement.appendChild(headerDiv);
+        msgElement.appendChild(textDiv);
+      }
+
+      chatDiv.appendChild(msgElement);
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+    });
+
+    function sendMessage() {
+      const text = msgInput.value.trim();
+      if (!text) return;
+
+      socket.emit("comment", {
+        bookId: bookId,
+        user: currentUsername,
+        text: text,
+      });
+
+      msgInput.value = "";
+    }
+
+    msgInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+  </script>
 </div>

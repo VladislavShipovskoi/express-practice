@@ -4,10 +4,41 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const session = require("express-session");
 const User = require("./models/User");
-const { logger, error404, error, isLoggedIn } = require("./middleware");
+const { logger, error404, error } = require("./middleware");
 const { apiBookRouter, uiUserRouter, uiBookRouter } = require("./routes");
 
 const app = express();
+
+const { createServer } = require("node:http");
+const server = createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server);
+
+io.on("connection", (socket) => {
+  const { id } = socket;
+  console.log("connection: " + id);
+
+  socket.on("joinBookRoom", (bookId) => {
+    socket.join(`book_${bookId}`);
+  });
+
+  socket.on("comment", ({ bookId, user, text }) => {
+    const payload = {
+      user: user,
+      text: text,
+      time: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+
+    io.to(`book_${bookId}`).emit("newComment", payload);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("disconnect: " + id);
+  });
+});
 
 app.use(express.json());
 app.set("view engine", "ejs");
@@ -45,7 +76,7 @@ app.use(error);
 async function start(PORT, DB_URL) {
   try {
     await mongoose.connect(DB_URL);
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`Library app listening on port ${PORT}`);
     });
   } catch (error) {
