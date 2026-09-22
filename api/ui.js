@@ -1,4 +1,3 @@
-const { books: booksStore } = require("../store");
 const {
   getAllBase,
   getByIdBase,

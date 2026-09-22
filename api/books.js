@@ -1,5 +1,3 @@
-const { books: booksStore } = require("../store");
-const { fileUpload } = require("../middleware");
 const { Book } = require("../models/");
 
 const getAllBase = async () => {
@@ -13,7 +11,7 @@ const getAllBase = async () => {
 
 const getByIdBase = async (id) => {
   try {
-    const book = await BookModel.findById(id).select("-__v");
+    const book = await Book.findById(id).select("-__v");
     return book;
   } catch (e) {
     throw e;
@@ -43,7 +41,7 @@ const updateBase = async (req, res, callbackSuccess, callbackError) => {
         }
       }
 
-      const updatedBook = await BookModel.findByIdAndUpdate(id, bodyData);
+      const updatedBook = await Book.findByIdAndUpdate(id, bodyData);
       callbackSuccess(updatedBook);
     } else {
       callbackError();
@@ -104,7 +102,7 @@ const deleteByIdBase = async (req, res, callbackSuccess, callbackError) => {
     const book = await getByIdBase(id);
 
     if (book) {
-      await BookModel.deleteOne({ _id: id });
+      await Book.deleteOne({ _id: id });
       callbackSuccess();
     } else {
       callbackError();

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { fileUpload, isLoggedIn } = require("../../middleware");
-const { uiApi, booksApi, authApi } = require("../../api");
+const { isLoggedIn } = require("../../middleware");
+const { uiApi, authApi } = require("../../api");
 
 router.get("/login", uiApi.login);
 router.get("/register", uiApi.register);
