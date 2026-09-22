@@ -125,10 +125,7 @@
     });
 
     socket.on("newComment", (msg) => {
-      const authorName =
-        typeof msg.user === "object" && msg.user !== null
-          ? msg.user.username || msg.user.name || "Аноним"
-          : msg.user || "Аноним";
+      const authorName = msg.user;
 
       const isMe = authorName === currentUsername;
       const msgElement = document.createElement("div");
