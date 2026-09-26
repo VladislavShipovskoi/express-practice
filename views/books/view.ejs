@@ -116,7 +116,10 @@
     const bookId = dataContainer.dataset.bookId;
     const currentUsername = dataContainer.dataset.user;
 
-    const socket = io();
+    const socket = io({
+      withCredentials: true
+    });
+    
     const chatDiv = document.getElementById("chat");
     const msgInput = document.getElementById("message");
 
@@ -124,7 +127,15 @@
       socket.emit("joinBookRoom", bookId);
     });
 
+    socket.on("getComments", (comments) => {
+      comments.forEach(msg => renderMessage(msg));
+    });
+
     socket.on("newComment", (msg) => {
+      renderMessage(msg)
+    });
+    
+    function renderMessage(msg) {
       const authorName = msg.user;
 
       const isMe = authorName === currentUsername;
@@ -185,7 +196,7 @@
 
       chatDiv.appendChild(msgElement);
       chatDiv.scrollTop = chatDiv.scrollHeight;
-    });
+    }
 
     function sendMessage() {
       const text = msgInput.value.trim();
@@ -193,7 +204,6 @@
 
       socket.emit("comment", {
         bookId: bookId,
-        user: currentUsername,
         text: text,
       });
 
