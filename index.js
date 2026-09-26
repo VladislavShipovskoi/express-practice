@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const session = require("express-session");
-const User = require("./models/User");
+const { User } = require("./models");
 const { logger, error404, error } = require("./middleware");
 const { apiBookRouter, uiUserRouter, uiBookRouter } = require("./routes");
 
