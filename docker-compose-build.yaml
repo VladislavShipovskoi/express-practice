@@ -1,42 +1,75 @@
 services:
   storage:
-    image: redis
+    image: redis:alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
     volumes:
-      - ./data:/data
+      - redis_data_build:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
   mongo:
-    image: mongo
+    image: mongo:latest
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongo_data_build:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
 
   mongo-express:
-    image: mongo-express
+    image: mongo-express:latest
     restart: always
     ports:
-      - 8081:8081
+      - "8081:8081"
     environment:
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
-      ME_CONFIG_BASICAUTH_ENABLED: true
+      ME_CONFIG_BASICAUTH_ENABLED: "true"
       ME_CONFIG_BASICAUTH_USERNAME: mongoexpressuser
       ME_CONFIG_BASICAUTH_PASSWORD: mongoexpresspass
+    depends_on:
+      mongo:
+        condition: service_healthy
+
   counter:
     build: ./counter-service
+    restart: unless-stopped
     environment:
       - PORT=3001
-      - REDIS_URL=redis://storage
+      - REDIS_URL=redis://storage:6379
     ports:
-      - 3001:3001
+      - "3001:3001"
     depends_on:
-      - storage
+      storage:
+        condition: service_healthy
+
   library:
     build: .
+    restart: unless-stopped
     environment:
       - PORT=3000
       - COUNTER_SERVICE_URL=http://counter:3001
-      - DB_URL=mongodb://root:example@mongo:27017
-      - REDIS_URL=redis://storage
+      - DB_URL=mongodb://root:example@mongo:27017/library?authSource=admin
+      - REDIS_URL=redis://storage:6379
     ports:
-      - 80:3000
+      - "80:3000"
     depends_on:
-      - counter
+      mongo:
+        condition: service_healthy
+      storage:
+        condition: service_healthy
+      counter:
+        condition: service_started
+volumes:
+  mongo_data_build:
+  redis_data_build:

@@ -1,51 +1,88 @@
 services:
   storage:
-    image: redis
+    image: redis:alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
     volumes:
-      - ./data:/data
+      - redis_data_dev:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
   mongo:
-    image: mongo
+    image: mongo:latest
     restart: always
+    ports:
+      - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongo_data_dev:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      interval: 20s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
 
   mongo-express:
-    image: mongo-express
+    image: mongo-express:latest
     restart: always
     ports:
-      - 8081:8081
+      - "8081:8081"
     environment:
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
-      ME_CONFIG_BASICAUTH_ENABLED: true
+      ME_CONFIG_BASICAUTH_ENABLED: "true"
       ME_CONFIG_BASICAUTH_USERNAME: mongoexpressuser
       ME_CONFIG_BASICAUTH_PASSWORD: mongoexpresspass
+    depends_on:
+      mongo:
+        condition: service_healthy
+
   counter:
-    image: node:24.18.0
+    image: node:22-alpine
     working_dir: /app
     volumes:
       - ./counter-service:/app
     environment:
       - PORT=3001
-      - REDIS_URL=redis://storage
+      - REDIS_URL=redis://storage:6379
     ports:
-      - 3001:3001
+      - "3001:3001"
     command: npm run dev
+    restart: unless-stopped
     depends_on:
-      - storage
+      storage:
+        condition: service_healthy
+
   library:
-    image: node:24.18.0
+    image: node:22-alpine
     working_dir: /app
     volumes:
       - ./:/app
     environment:
       - PORT=3000
       - COUNTER_SERVICE_URL=http://counter:3001
-      - DB_URL=mongodb://root:example@mongo:27017
-      - REDIS_URL=redis://storage
+      - DB_URL=mongodb://root:example@mongo:27017/library?authSource=admin
+      - REDIS_URL=redis://storage:6379
     ports:
-      - 80:3000
+      - "80:3000"
     command: npm run dev-docker
+    restart: unless-stopped
     depends_on:
-      - counter
-      - mongo
+      mongo:
+        condition: service_healthy
+      storage:
+        condition: service_healthy
+      counter:
+        condition: service_started
+
+volumes:
+  mongo_data_dev:
+  redis_data_dev:

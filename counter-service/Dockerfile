@@ -1,7 +1,7 @@
-FROM node:24.18.0
+FROM node:22-alpine
 WORKDIR /app
 ARG NODE_ENV=production
-COPY ./package*.json ./
-RUN npm install
+COPY package*.json ./
+RUN npm ci --omit=dev
 COPY . .
-CMD ["npm", "run", "server"]
+CMD ["node", "index.js"]
