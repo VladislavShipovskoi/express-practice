@@ -56,6 +56,8 @@ services:
   library:
     build: .
     restart: unless-stopped
+    volumes:
+      - uploads_data_build:/app/public/img
     environment:
       - PORT=3000
       - COUNTER_SERVICE_URL=http://counter:3001
@@ -73,3 +75,4 @@ services:
 volumes:
   mongo_data_build:
   redis_data_build:
+  uploads_data_build:
