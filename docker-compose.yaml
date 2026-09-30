@@ -63,6 +63,7 @@ services:
       - COUNTER_SERVICE_URL=http://counter:3001
       - DB_URL=mongodb://root:example@mongo:27017/library?authSource=admin
       - REDIS_URL=redis://storage:6379
+      - "SECRET=${SECRET:?add SECRET to .env}"
     ports:
       - 80:3000
     depends_on:
