@@ -54,7 +54,7 @@ services:
       - PORT=3001
       - REDIS_URL=redis://storage:6379
     ports:
-      - "3001:3001"
+      - "127.0.0.1:3001:3001"
     command: npm run dev
     restart: unless-stopped
     depends_on:

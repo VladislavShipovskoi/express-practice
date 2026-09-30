@@ -8,7 +8,7 @@ const login = (req, res, next) => {
   })(req, res, next);
 };
 
-const register = async (req, res) => {
+const register = async (req, res, next) => {
   try {
     const { username, password, email } = req.body;
     const user = new User({ username, email });
@@ -24,7 +24,7 @@ const register = async (req, res) => {
   }
 };
 
-const logout = (req, res) => {
+const logout = (req, res, next) => {
   req.logout((err) => {
     if (err) {
       return next(err);
