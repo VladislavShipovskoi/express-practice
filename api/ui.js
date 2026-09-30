@@ -1,4 +1,5 @@
 const {
+  isOwner,
   getAllBase,
   getByIdBase,
   createBase,
@@ -27,6 +28,12 @@ const updateForm = async (req, res) => {
     return res.render("main", {
       title: "Page Not Found",
       content: "errors/404",
+    });
+
+  if (!isOwner(book, req.user))
+    return res.status(403).render("main", {
+      title: "Access Denied",
+      content: "errors/403",
     });
 
   res.render("main", {
@@ -104,6 +111,12 @@ const deleteById = async (req, res) => {
         content: "errors/404",
       });
     },
+    () => {
+      return res.status(403).render("main", {
+        title: "Access Denied",
+        content: "errors/403",
+      });
+    },
   );
 };
 
@@ -118,6 +131,12 @@ const updateFormSubmit = async (req, res) => {
       return res.render("main", {
         title: "Page Not Found",
         content: "errors/404",
+      });
+    },
+    () => {
+      return res.status(403).render("main", {
+        title: "Access Denied",
+        content: "errors/403",
       });
     },
   );

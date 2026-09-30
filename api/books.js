@@ -1,5 +1,8 @@
 const { Book } = require("../models/");
 
+const isOwner = (book, user) =>
+  Boolean(user) && String(book.userId) === String(user._id);
+
 const getAllBase = async () => {
   try {
     const books = await Book.find().select("-__v");
@@ -18,14 +21,24 @@ const getByIdBase = async (id) => {
   }
 };
 
-const updateBase = async (req, res, callbackSuccess, callbackError) => {
+const updateBase = async (
+  req,
+  res,
+  callbackSuccess,
+  callbackError,
+  callbackForbidden,
+) => {
   const { id } = req.params;
 
   try {
     const book = await getByIdBase(id);
 
     if (book.id) {
-      const { id: _, ...bodyData } = req.body;
+      if (!isOwner(book, req.user)) {
+        return callbackForbidden();
+      }
+
+      const { id: _, userId: __, ...bodyData } = req.body;
 
       if (req.files) {
         const fileCover = req.files["fileCover"];
@@ -42,7 +55,7 @@ const updateBase = async (req, res, callbackSuccess, callbackError) => {
       }
 
       const updatedBook = await Book.findByIdAndUpdate(id, bodyData, {
-        new: true,
+        returnDocument: "after",
         runValidators: true,
       });
       callbackSuccess(updatedBook);
@@ -81,6 +94,7 @@ const createBase = async (req) => {
   }
 
   newBook = new Book({
+    userId: req.user._id,
     title: data.title,
     description: data.description,
     authors: data.authors,
@@ -98,13 +112,23 @@ const createBase = async (req) => {
   }
 };
 
-const deleteByIdBase = async (req, res, callbackSuccess, callbackError) => {
+const deleteByIdBase = async (
+  req,
+  res,
+  callbackSuccess,
+  callbackError,
+  callbackForbidden,
+) => {
   const { id } = req.params;
 
   try {
     const book = await getByIdBase(id);
 
     if (book) {
+      if (!isOwner(book, req.user)) {
+        return callbackForbidden();
+      }
+
       await Book.deleteOne({ _id: id });
       callbackSuccess();
     } else {
@@ -178,6 +202,12 @@ const update = async (req, res) => {
       () => {
         res.status(404).json({ message: "Book not found" });
       },
+      () => {
+        res.status(403).json({
+          error: "Forbidden",
+          message: "You do not have permissions to change this book.",
+        });
+      },
     );
   } catch (e) {
     res.status(500).json(e);
@@ -194,6 +224,11 @@ const deleteById = async (req, res) => {
         res.json({ status: "ok" });
       },
       () => res.status(404).json({ message: "Book not found" }),
+      () =>
+        res.status(403).json({
+          error: "Forbidden",
+          message: "You do not have permissions to change this book.",
+        }),
     );
   } catch (e) {
     res.status(500).json(e);
@@ -201,6 +236,7 @@ const deleteById = async (req, res) => {
 };
 
 module.exports = {
+  isOwner,
   getAllBase,
   getByIdBase,
   updateBase,
