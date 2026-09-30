@@ -48,7 +48,7 @@ services:
       - PORT=3001
       - REDIS_URL=redis://storage:6379
     ports:
-      - 3001:3001
+      - 127.0.0.1:3001:3001
     depends_on:
       storage:
         condition: service_healthy
@@ -56,11 +56,14 @@ services:
   library:
     image: vladislavshipovkoi/library:v1.0.0
     restart: unless-stopped
+    volumes:
+      - uploads_data:/app/public/img
     environment:
       - PORT=3000
       - COUNTER_SERVICE_URL=http://counter:3001
       - DB_URL=mongodb://root:example@mongo:27017/library?authSource=admin
       - REDIS_URL=redis://storage:6379
+      - "SECRET=${SECRET:?add SECRET to .env}"
     ports:
       - 80:3000
     depends_on:
@@ -74,3 +77,4 @@ services:
 volumes:
   mongo_data:
   redis_data:
+  uploads_data:

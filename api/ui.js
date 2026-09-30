@@ -47,8 +47,8 @@ const createForm = (req, res) => {
   });
 };
 
-const createFormSubmit = (req, res) => {
-  const newBook = createBase(req);
+const createFormSubmit = async (req, res) => {
+  await createBase(req);
   res.redirect("/");
 };
 
@@ -91,8 +91,8 @@ const view = async (req, res) => {
   res.render("main", renderContex);
 };
 
-const deleteById = (req, res) => {
-  deleteByIdBase(
+const deleteById = async (req, res) => {
+  await deleteByIdBase(
     req,
     res,
     () => {
@@ -107,8 +107,8 @@ const deleteById = (req, res) => {
   );
 };
 
-const updateFormSubmit = (req, res) => {
-  updateBase(
+const updateFormSubmit = async (req, res) => {
+  await updateBase(
     req,
     res,
     (book) => {

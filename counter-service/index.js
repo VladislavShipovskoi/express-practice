@@ -3,6 +3,8 @@ const redis = require("redis");
 
 const PORT = process.env.PORT || 3001;
 const REDIS_URL = process.env.REDIS_URL || "redis://localhost";
+const KEY_PREFIX = "views:";
+const OBJECT_ID = /^[0-9a-fA-F]{24}$/;
 
 const redisClient = redis.createClient({
   url: REDIS_URL,
@@ -15,15 +17,25 @@ const redisClient = redis.createClient({
 const app = express();
 
 app.get("/counter/:bookId", async (req, res) => {
-  const bookId = req.params.bookId;
-  const count = (await redisClient.get(bookId)) || 1;
+  const { bookId } = req.params;
+
+  if (!OBJECT_ID.test(bookId)) {
+    return res.status(400).json({ error: "Invalid bookId" });
+  }
+
+  const count = (await redisClient.get(`${KEY_PREFIX}${bookId}`)) || 1;
   res.json({ bookId, count });
 });
 
 app.post("/counter/:bookId/incr", async (req, res) => {
-  const bookId = req.params.bookId;
-  const count = await redisClient.incr(bookId);
-  res.json({ status: "ok" });
+  const { bookId } = req.params;
+
+  if (!OBJECT_ID.test(bookId)) {
+    return res.status(400).json({ error: "Invalid bookId" });
+  }
+
+  const count = await redisClient.incr(`${KEY_PREFIX}${bookId}`);
+  res.json({ status: "ok", count });
 });
 
 app.listen(PORT, () => {

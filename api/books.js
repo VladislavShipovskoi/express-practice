@@ -41,7 +41,10 @@ const updateBase = async (req, res, callbackSuccess, callbackError) => {
         }
       }
 
-      const updatedBook = await Book.findByIdAndUpdate(id, bodyData);
+      const updatedBook = await Book.findByIdAndUpdate(id, bodyData, {
+        new: true,
+        runValidators: true,
+      });
       callbackSuccess(updatedBook);
     } else {
       callbackError();
@@ -121,11 +124,11 @@ const getAll = async (req, res) => {
   }
 };
 
-const getById = (req, res) => {
+const getById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const book = getByIdBase(id);
+    const book = await getByIdBase(id);
 
     if (book) {
       res.json(book);
@@ -155,18 +158,18 @@ const downloadById = async (req, res) => {
   }
 };
 
-const create = (req, res) => {
+const create = async (req, res) => {
   try {
-    const newBook = createBase(req);
+    const newBook = await createBase(req);
     res.status(201).json(newBook);
   } catch (e) {
     res.status(500).json(e);
   }
 };
 
-const update = (req, res) => {
+const update = async (req, res) => {
   try {
-    updateBase(
+    await updateBase(
       req,
       res,
       (book) => {
@@ -181,9 +184,9 @@ const update = (req, res) => {
   }
 };
 
-const deleteById = (req, res) => {
+const deleteById = async (req, res) => {
   try {
-    deleteByIdBase(
+    await deleteByIdBase(
       req,
       res,
       () => {
